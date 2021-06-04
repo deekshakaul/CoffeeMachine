@@ -8,7 +8,7 @@ public class MakeDrinkTask(drinkToMake: Drink): Runnable {
     var drink: Drink = drinkToMake
 
     fun makeDrink() {
-        InventoryManager.instance.validateIngredientsAndUpdateInventory(drink)
+        InventoryManager.validateIngredientsAndUpdateInventory(drink)
     }
 
     override fun run() {

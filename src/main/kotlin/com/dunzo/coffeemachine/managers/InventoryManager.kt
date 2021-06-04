@@ -6,11 +6,9 @@ import com.dunzo.coffeemachine.models.Ingredient
 import org.slf4j.LoggerFactory
 import java.lang.String.format
 
-public class InventoryManager {
 
-    companion object {
-        var instance = InventoryManager()
-    }
+// Since there will only be one single inventory, makes sense to keep this as a singleton class
+object InventoryManager {
 
     private val log = LoggerFactory.getLogger(InventoryManager::class.java)
 
@@ -21,12 +19,10 @@ public class InventoryManager {
             val currentQuantity = inventory[item.key] ?: 0
             inventory[item.key] = currentQuantity + item.value
         }
-        println(inventory)
     }
 
     fun isIngredientEnough(ingredient: Ingredient): Boolean {
         inventory[ingredient.name]?.let { quantity ->
-            print("$quantity, ${ingredient.quantity}\n\n testing")
             return quantity >= ingredient.quantity
         }
         return false
@@ -36,12 +32,14 @@ public class InventoryManager {
         return inventory[ingredient.name] != null
     }
 
+    // Update the inventory everytime an ingredient is used to make a drink
     @Synchronized
     fun useIngredient(ingredient: Ingredient) {
         inventory[ingredient.name]?.let {
-            log.info("before using ingr ${inventory[ingredient.name]}")
             inventory[ingredient.name] = inventory[ingredient.name]?.minus(ingredient.quantity) ?: 0
-            log.info("after using ingr ${inventory[ingredient.name]}")
+            if (it < CoffeeMachineConstants.thresholdQuantity) {
+                notifyLowQuantity(ingredient.name)
+            }
         }
     }
 
@@ -63,7 +61,7 @@ public class InventoryManager {
             drink.ingredients.forEach { item ->
                useIngredient(item)
             }
-            log.info("EEEE ${format(CoffeeMachineConstants.drinkMade, drink.name)}")
+            println("${format(CoffeeMachineConstants.drinkMade, drink.name)}")
         } else {
 
             // Even if multiple ingredients are unavailable or insufficient, returning only one missing ingredient for now
@@ -72,14 +70,23 @@ public class InventoryManager {
             // by making unavailable and insufficient into arrays and formatting the message accordingly.
 
             if (unavailable.isNotBlank()) {
-                log.info("RRRRR ${format(CoffeeMachineConstants.unavailableIngredient, drink.name, unavailable)}")
+                println("${format(CoffeeMachineConstants.unavailableIngredient, drink.name, unavailable)}")
             } else {
-                log.info("WWWWW ${format(CoffeeMachineConstants.insufficientIngredient, drink.name, insufficient)}")
+                println("${format(CoffeeMachineConstants.insufficientIngredient, drink.name, insufficient)}")
             }
         }
     }
 
+    fun notifyLowQuantity(ingredientName: String) {
+        println(format(CoffeeMachineConstants.runningLow, ingredientName))
+    }
+
+    fun refillIngredient(ingredient: Ingredient) {
+        inventory[ingredient.name] = inventory[ingredient.name]?.plus(ingredient.quantity) ?: ingredient.quantity
+    }
+
     fun clearInventory() {
         inventory.clear()
+        println("${inventory}")
     }
 }
