@@ -12,33 +12,38 @@ import java.util.concurrent.Executors
 // Object as it makes sense to keep CoffeeMachineManager a singleton class -> Since there is only one machine rather than multiple instances
 object CoffeeMachineManager {
 
-        var outlets: Int = 0
-        lateinit var requests: HashMap<String, HashMap<String, Int>>
-        lateinit var executor: ExecutorService
+    var outlets: Int = 0
+    lateinit var requests: HashMap<String, HashMap<String, Int>>
+    lateinit var executor: ExecutorService
 
-        fun setupCoffeeMachine(inputJsonAsString: String) {
-            val input = Gson().fromJson(inputJsonAsString, Input::class.java)
-            InventoryManager.makeOrUpdateInventory(input.machine.total_items_quantity)
-            outlets = input.machine.outlets.count_n
-            requests = input.machine.beverages
-            executor = Executors.newFixedThreadPool(outlets)
-        }
+    fun setupCoffeeMachine(inputJsonAsString: String) {
+        val input = Gson().fromJson(inputJsonAsString, Input::class.java)
+        InventoryManager.makeOrUpdateInventory(input.machine.total_items_quantity)
+        outlets = input.machine.outlets.count_n
+        requests = input.machine.beverages
+        executor = Executors.newFixedThreadPool(outlets)
+    }
 
-        fun processRequests() {
-            var ingredientList: CopyOnWriteArrayList<Ingredient> = CopyOnWriteArrayList()
-            requests.forEach { (name, ingredients) ->
-                ingredients.forEach { ingredient ->
-                    ingredientList.add(Ingredient(ingredient.key, ingredient.value))
-                }
-                placeOrder(Drink(name, ingredientList))
-                ingredientList = CopyOnWriteArrayList()
+    fun processRequests() {
+        var ingredientList: CopyOnWriteArrayList<Ingredient> = CopyOnWriteArrayList()
+        requests.forEach { (name, ingredients) ->
+            ingredients.forEach { ingredient ->
+                ingredientList.add(Ingredient(ingredient.key, ingredient.value))
             }
+            placeOrder(Drink(name, ingredientList))
+            ingredientList = CopyOnWriteArrayList()
         }
+    }
 
-        fun placeOrder(drink: Drink) {
-            // Using Tasks as we can utilize the multiple CPUs in our coffee machine to take three orders in parellel
-            val makeDrinkTask = MakeDrinkTask(drink)
-            executor.execute(makeDrinkTask)
-        }
+    fun placeOrder(drink: Drink) {
+        // Using Tasks as we can utilize the multiple CPUs in our coffee machine to take three orders in parellel
+        val makeDrinkTask = MakeDrinkTask(drink)
+        executor.execute(makeDrinkTask)
+    }
+
+    fun stopCoffeeMachine() {
+        executor.shutdown()
+    }
+
 
 }

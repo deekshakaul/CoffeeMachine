@@ -17,7 +17,7 @@ class CoffeemachineApplicationTests {
 	@AfterEach
 	fun reset() {
 		Thread.sleep(1000)
-		CoffeeMachineManager.executor.shutdown()
+		CoffeeMachineManager.stopCoffeeMachine()
 		InventoryManager.clearInventory()
 	}
 

@@ -59,7 +59,7 @@ object InventoryManager {
         }
         if (canMake) {
             drink.ingredients.forEach { item ->
-               useIngredient(item)
+                useIngredient(item)
             }
             println("${format(CoffeeMachineConstants.drinkMade, drink.name)}")
         } else {
