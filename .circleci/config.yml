@@ -9,4 +9,4 @@ jobs:
           path: target/surefire-reports
       - run:
           name: Upload to CodeCov
-          command: bash <(curl -s https://codecov.io/bash)
+          command: bash <(curl -s https://codecov.io/bash) -f target/surefire-reports/TEST-com.dunzo.coffeemachine.CoffeemachineApplicationTests.xml
