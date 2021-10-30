@@ -7,5 +7,7 @@ jobs:
       - run: mvn test
       - store_test_results:
           path: target/surefire-reports
-      - codecov/upload:
-          file: target/surefire-reports/TEST-com.dunzo.coffeemachine.CoffeemachineApplicationTests.xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+            token: ${{ c7fc4d83-74b4-47ae-ad9f-9388aba976e3 }}
