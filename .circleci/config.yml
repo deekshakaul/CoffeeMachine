@@ -7,6 +7,5 @@ jobs:
       - run: mvn test
       - store_test_results:
           path: target/surefire-reports
-      - run:
-          name: Upload to CodeCov
-          command: bash <(curl -s https://codecov.io/bash) -f /home/circleci/project/target/surefire-reports/TEST-com.dunzo.coffeemachine.CoffeemachineApplicationTests.xml
+      - codecov/upload:
+          file: target/surefire-reports/TEST-com.dunzo.coffeemachine.CoffeemachineApplicationTests.xml
