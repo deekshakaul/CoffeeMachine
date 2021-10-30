@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  codecov: codecov/codecov@3.1.1
+  codecov: codecov/codecov@1.0.2
 jobs:
   build:
     docker:
@@ -9,5 +9,7 @@ jobs:
       - checkout
       - run: mvn test
       - store_test_results:
-          path: target/surefire-
-      - codecov/upload
+          path: target/surefire-reports
+      - run:
+          name: Upload to CodeCov
+          command: bash <(curl -s https://codecov.io/bash)
