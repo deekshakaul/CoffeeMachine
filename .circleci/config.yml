@@ -1,13 +1,8 @@
+version: 2.1
+orbs:
+  codecov: codecov/codecov@1.0.2
 jobs:
   build:
-    docker:
-      - image: circleci/openjdk:11-jdk
     steps:
-      - checkout
-      - run: mvn test
-      - store_test_results:
-          path: target/surefire-reports
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-            token: ${{ c7fc4d83-74b4-47ae-ad9f-9388aba976e3 }}
+      - codecov/upload:
+          file: {{ target/surefire-reports/TEST-com.dunzo.coffeemachine.CoffeemachineApplicationTests.xml }}
